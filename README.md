@@ -12,4 +12,4 @@ How to run:
 7. (Optional) `.\manage.py createsuperuser`
 8. `.\manage.py runserver [ip:port]`
 
-on steps 6-8 for Linux systems replace "\" with "/"
+on steps 6-8 for Linux systems replace "\\" with "/"

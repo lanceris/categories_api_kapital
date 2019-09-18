@@ -18,8 +18,6 @@ class CreateCategorySerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(validated_data)
-        print('!'*30)
         children = validated_data.pop('children', [])
         top_cat = super().create(validated_data)
         for child in children:
@@ -40,7 +38,11 @@ class ReadCategorySerializer(serializers.ModelSerializer):
 
     def get_parents(self, obj):
         if obj.parent:
+            #TODO: make it recursive
             qs = Category.objects.filter(pk=obj.parent.pk)
+            qs2 = Category.objects.filter(pk=qs[0].parent.pk)
+            qs3 = Category.objects.filter(pk=qs2[0].parent.pk)
+            print(qs3)
         else:
             qs = Category.objects.none()
         serializer = SubCategorySerializer(qs, many=True)

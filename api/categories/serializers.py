@@ -35,17 +35,24 @@ class ReadCategorySerializer(serializers.ModelSerializer):
     parents = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
     siblings = serializers.SerializerMethodField()
+    
+    def get_ancestors(self, parents, obj):
+        if obj.parent:
+            qs = Category.objects.filter(pk=obj.parent.pk)
+            parents += qs
+            if qs:
+                res = self.get_parents(obj=qs[0])
+                parents += res
+            else:
+                parents = [qs]
+        return parents
+
 
     def get_parents(self, obj):
-        if obj.parent:
-            #TODO: make it recursive
-            qs = Category.objects.filter(pk=obj.parent.pk)
-            qs2 = Category.objects.filter(pk=qs[0].parent.pk)
-            qs3 = Category.objects.filter(pk=qs2[0].parent.pk)
-            print(qs3)
-        else:
-            qs = Category.objects.none()
-        serializer = SubCategorySerializer(qs, many=True)
+        parents = []
+        ancestors = self.get_ancestors(parents, obj)
+
+        serializer = SubCategorySerializer(parents, many=True)
         return serializer.data
 
 
@@ -53,6 +60,7 @@ class ReadCategorySerializer(serializers.ModelSerializer):
         children = obj.children.all()
         serializer = SubCategorySerializer(children, many=True)
         return serializer.data
+
 
     def get_siblings(self, obj):
         if obj.parent:

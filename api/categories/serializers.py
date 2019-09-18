@@ -36,6 +36,7 @@ class CreateCategorySerializer(serializers.ModelSerializer):
 class ReadCategorySerializer(serializers.ModelSerializer):
     parents = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
+    siblings = serializers.SerializerMethodField()
 
     def get_parents(self, obj):
         if obj.parent:
@@ -51,6 +52,14 @@ class ReadCategorySerializer(serializers.ModelSerializer):
         serializer = SubCategorySerializer(children, many=True)
         return serializer.data
 
+    def get_siblings(self, obj):
+        if obj.parent:
+            qs = obj.parent.children.all()
+        else:
+            qs = Category.objects.none()
+        serializer = SubCategorySerializer(qs, many=True)
+        return serializer.data
+
     class Meta:
         model = Category
-        fields = ('id', 'name',  'parents', 'children')
+        fields = ('id', 'name',  'parents', 'children', 'siblings')

@@ -64,7 +64,7 @@ class ReadCategorySerializer(serializers.ModelSerializer):
 
     def get_siblings(self, obj):
         if obj.parent:
-            qs = obj.parent.children.all()
+            qs = obj.parent.children.exclude(pk=obj.pk)
         else:
             qs = Category.objects.none()
         serializer = SubCategorySerializer(qs, many=True)
